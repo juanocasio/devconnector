@@ -21,10 +21,10 @@ router.get('/test', (req, res) => res.json({msg: "Users Works!"}));
 //@desc:    Register user
 //@access:  Public
 router.post('/register', (req, res) => {
-  // const {errors, isvalid } = validateRegisterInput(req.body);
-  // if(!isvalid) {
-  //   return res.status(406).json(errors);
-  // }
+  const {errors, isValid } = validateRegisterInput(req.body);
+  if(!isValid) {
+    return res.status(406).json(errors);
+  }
 
   User.findOne({email: req.body.email })
       .then( user => {
@@ -61,14 +61,14 @@ router.post('/register', (req, res) => {
 //@desc:    Login User / Return JWT Token
 //@access:  Public
 router.post('/login', (req, res) => {
-  // const {errors, isvalid } = validateLoginInput(req.body);
-  // if(!isvalid) {
-  //   return res.status(400).json(errors);
-  // };
+  const {errors, isValid } = validateLoginInput(req.body);
+  if(!isValid) {
+    return res.status(400).json(errors);
+  };
 
   const email = req.body.email;
   const password = req.body.password;
-  const errors = {};
+  //const errors = {};
   //Find user
   User.findOne({ email })
       .then(user => {
