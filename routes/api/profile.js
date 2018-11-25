@@ -7,6 +7,7 @@ const passport = require('passport');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 const validateProfileInput = require('../../validation/profile');
+const validateExperienceInput = require('../../validation/experience');
 
 router.get('/test', (req, res) => res.json({msg: "Profile Works!"}));
 
@@ -191,6 +192,14 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) =>{
 //@desc:    Add experience to profile
 //@access:  Private
 router.post('/experience', passport.authenticate('jwt', { session: false }), (req, res) => {
+
+    //destructure validateProfileInput properties
+    const { errors, isValid } = validateExperienceInputInput(req.body);
+  
+    if(!isValid){
+      return res.status(400).json(errors);
+    }
+
   Profile.findOne( { user: req.body.user })
   .then(profile => {
     const newExp = {
@@ -204,6 +213,29 @@ router.post('/experience', passport.authenticate('jwt', { session: false }), (re
     }
 
     //Add to experience array
+    profile.experience.unshift(newExp);
+
+    profile.save().then(profile => res.json(profile));
+  });
+});
+
+//@route:   POST api/profile/education
+//@desc:    Add education to profile
+//@access:  Private
+router.post('/education', passport.authenticate('jwt', { session: false }), (req, res) => {
+  Profile.findOne( { user: req.body.user })
+  .then(profile => {
+    const newExp = {
+      title: req.body.title,
+      company: req.body.company,
+      location: req.body.location,
+      from: req.body.from,
+      to: req.body.to,
+      current: req.body.current,
+      description: req.body.description
+    }
+
+    //Add to/education array
     profile.experience.unshift(newExp);
 
     profile.save().then(profile => res.json(profile));
